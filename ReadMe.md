@@ -1,274 +1,371 @@
-# Ausadhi - Medicine Availability Tracker
+# Ausadhi
 
-"Know before you go. Find medicines near you in seconds."
+**Medicine Availability Tracker for Nepal**
 
-Overview
+*A hyper-local platform that enables citizens to discover medicine availability in nearby pharmacies while helping pharmacy owners manage their inventory digitally.*
 
-Ausadhi is a hyper-local medicine availability tracker built specifically for Nepal. It connects pharmacy owners with the general public, allowing users to search for medicines and find nearby pharmacies that have them in stock.
+---
 
-Problem We Solve
+## Table of Contents
 
-- People waste hours visiting multiple pharmacies to find specific medicines
-- No real-time visibility of medicine stock across pharmacies
-- Patients with chronic conditions struggle to find their regular medications
-- Pharmacy owners have no digital platform to showcase their inventory
+- Overview
+- Problem Statement
+- Solution
+- Features
+- System Architecture
+- Technology Stack
+- Project Structure
+- Installation
+- Configuration
+- Running the Application
+- API Reference
+- Database Design
+- Security
+- Roadmap
+- Contributing
+- License
+- Team
 
-Our Solution
+---
 
-- Real-time medicine search across verified pharmacies
-- Pharmacy owners can easily manage their inventory
-- Bulk upload via Excel for quick inventory setup
-- Community-driven "Report Mismatch" system to maintain accuracy
-- Anti-spam protection prevents competitors from sabotaging stock data
+## Overview
 
-Key Features
+Ausadhi is a full-stack web application developed to solve one of Nepal's most common healthcare challenges—locating medicines quickly.
 
-For Public Users (No Login Required)
+Instead of visiting multiple pharmacies, users can search for medicines online and instantly discover pharmacies where the medicine is currently available. Pharmacy owners receive a dedicated dashboard for maintaining inventory, updating stock status, and managing reports submitted by the community.
 
-- Search Medicines - Find any medicine by name
-- Nearby Pharmacies - See which pharmacies have your medicine in stock
-- Status Badges - Green (Available) / Red (Out of Stock)
-- Contact Info - Phone numbers and locations of pharmacies
-- Report Mismatch - Alert owners if stock information is incorrect
+The project is designed around three principles:
 
-For Pharmacy Owners (JWT Authentication)
+- Fast medicine discovery
+- Reliable inventory information
+- Simple inventory management for pharmacies
 
-- Dashboard - Complete inventory management
-- Bulk Upload - Add hundreds of medicines via Excel/CSV
-- Stock Management - Toggle medicines Available/Out of Stock instantly
-- Report Tracking - See how many users reported mismatches
-- Quick Add - Add single medicines on the fly
+---
 
-Tech Stack
+## Problem Statement
 
-Backend
+Patients frequently experience delays in obtaining prescribed medicines due to the absence of a centralized inventory system.
 
-- Node.js - JavaScript runtime
-- Express.js - Web framework
-- MongoDB - NoSQL database
-- Mongoose - ODM for MongoDB
-- JWT - Authentication
-- Bcrypt - Password hashing
-- xlsx (SheetJS) - Excel file parsing
-- Multer - File upload handling
+Current challenges include:
 
-Frontend
+- No visibility into medicine availability across pharmacies
+- Time lost visiting multiple stores
+- Difficulty locating emergency medicines
+- No digital platform for local pharmacy inventories
+- Manual communication between patients and pharmacies
 
-- React.js - UI library
-- Vite - Build tool
-- React Router DOM - Navigation
-- Axios - HTTP client
-- CSS3 - Custom styling with responsive design
+---
 
-DevOps
+## Solution
 
-- Environment Variables - Secure configuration
-- CORS - Cross-origin resource sharing
+Ausadhi provides a centralized platform connecting pharmacies and the public.
 
-Project Structure
+Users can search medicines and immediately view pharmacies where the medicine is available.
+
+Pharmacy owners manage their inventories through a secure dashboard, while community-driven reporting helps maintain data accuracy.
+
+---
+
+## Features
+
+### Public Portal
+
+- Medicine Search
+- Nearby Pharmacy Discovery
+- Availability Status
+- Pharmacy Contact Information
+- Community Mismatch Reporting
+- No Authentication Required
+
+### Pharmacy Dashboard
+
+- Secure Authentication
+- Inventory Management
+- Bulk Excel/CSV Upload
+- Stock Availability Updates
+- Report Monitoring
+- Medicine Management
+
+---
+
+## System Architecture
+
+```text
+                Users
+                  │
+                  │
+          React + Vite Client
+                  │
+         REST API (Express.js)
+                  │
+        JWT Authentication Layer
+                  │
+        MongoDB Database Server
+                  │
+        Pharmacy Inventory Data
 ```
+
+---
+
+## Technology Stack
+
+### Frontend
+
+| Technology | Purpose |
+|------------|----------|
+| React | User Interface |
+| Vite | Build Tool |
+| React Router DOM | Routing |
+| Axios | HTTP Client |
+| CSS3 | Styling |
+
+### Backend
+
+| Technology | Purpose |
+|------------|----------|
+| Node.js | JavaScript Runtime |
+| Express.js | REST API |
+| MongoDB | Database |
+| Mongoose | ODM |
+| JWT | Authentication |
+| Bcrypt | Password Hashing |
+| Multer | File Upload |
+| SheetJS | Excel Processing |
+
+---
+
+## Project Structure
+
+```text
 ausadhi/
-├── server/
-│ ├── models/
-│ │ ├── User.js # Pharmacy owner model
-│ │ └── Medicine.js # Inventory model
-│ ├── routes/
-│ │ ├── auth.js # Register/Login routes
-│ │ └── medicines.js # Medicine CRUD routes
-│ ├── controllers/
-│ │ ├── authController.js
-│ │ └── medicineController.js
-│ ├── middleware/
-│ │ └── auth.js # JWT verification
-│ ├── server.js # Entry point
-│ └── .env # Environment variables
 │
 ├── client/
-│ ├── src/
-│ │ ├── components/
-│ │ │ ├── Navbar.jsx
-│ │ │ ├── SearchBar.jsx
-│ │ │ └── MedicineCard.jsx
-│ │ ├── pages/
-│ │ │ ├── Home.jsx
-│ │ │ ├── Login.jsx
-│ │ │ ├── Register.jsx
-│ │ │ └── Dashboard.jsx
-│ │ ├── App.jsx
-│ │ └── main.jsx
-│ └── package.json
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── assets/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   └── package.json
 │
-├── .env.example
+├── server/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── uploads/
+│   ├── utils/
+│   ├── server.js
+│   └── package.json
+│
 ├── README.md
-└── package.json
+├── package.json
+└── .env.example
 ```
-Installation and Setup
 
-Prerequisites
+---
 
-- Node.js (v16 or higher)
-- MongoDB Atlas account (or local MongoDB)
-- Git
+## Installation
 
-1. Clone the Repository
+### Clone the Repository
 
-git clone https://github.com/yourusername/ausadhi.git
+```bash
+git clone https://github.com/anandksri/ausadhi.git
+
 cd ausadhi
+```
 
-2. Backend Setup
+### Install Backend Dependencies
 
+```bash
 cd server
+
 npm install
+```
 
-Create .env file in the server/ directory:
+### Install Frontend Dependencies
 
-PORT=5000
-MONGO_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/ausadhi
-JWT_SECRET=ausadhi_secret_key_nepal_2026
-
-3. Frontend Setup
-
+```bash
 cd ../client
+
 npm install
+```
 
-4. Run the Application
+---
 
-Backend (from server/ folder)
+## Configuration
+
+Create a `.env` file inside the `server` directory.
+
+```env
+PORT=5000
+
+MONGO_URI=your_mongodb_connection_string
+
+JWT_SECRET=your_secure_jwt_secret
+```
+
+---
+
+## Running the Application
+
+### Start Backend
+
+```bash
+cd server
 
 npm run dev
+```
 
-Server runs on: http://localhost:5000
+Backend runs at:
 
-Frontend (from client/ folder)
+```
+http://localhost:5000
+```
+
+### Start Frontend
+
+```bash
+cd client
 
 npm run dev
+```
 
-Client runs on: http://localhost:5173
+Frontend runs at:
 
-Responsive Breakpoints
+```
+http://localhost:5173
+```
 
-Device Screen Width Cards per Row
-Small Mobile below 480px 1
-Mobile 480px - 767px 1
-Tablet 768px - 1023px 2
-Desktop 1024px and above 3
+---
 
-Database Schema
+## REST API
 
-User Model (Pharmacy Owner)
+### Authentication
 
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| POST | `/api/auth/register` | Register a Pharmacy |
+| POST | `/api/auth/login` | Authenticate Pharmacy Owner |
+
+### Medicines
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/api/medicines/search?q=` | Search Medicines |
+| POST | `/api/medicines` | Add Medicine |
+| POST | `/api/medicines/bulk-upload` | Upload Inventory |
+| PUT | `/api/medicines/:id/status` | Update Availability |
+| POST | `/api/medicines/:id/report` | Report Incorrect Stock |
+
+---
+
+## Database Schema
+
+### User
+
+```javascript
 {
-shopName: String, required, unique
-ownerName: String, required
-phone: String, required, unique
-location: String, required
-password: String, required, hashed
+    shopName: String,
+    ownerName: String,
+    phone: String,
+    location: String,
+    password: String
 }
+```
 
-Medicine Model (Inventory)
+### Medicine
 
+```javascript
 {
-pharmacyId: ObjectId, ref: 'User', required
-medicineName: String, required, indexed
-category: String
-status: String, enum: ['Available', 'Out_of_Stock'], default: 'Available'
-reportCount: Number, default: 0
-lastUpdated: Date, default: Date.now
+    pharmacyId: ObjectId,
+    medicineName: String,
+    category: String,
+    status: "Available" | "Out_of_Stock",
+    reportCount: Number,
+    lastUpdated: Date
 }
+```
 
-Security Features
+---
 
-- JWT Authentication - Secure owner login
-- Bcrypt Password Hashing - Passwords never stored in plain text
-- Route Protection - Only owners can access dashboard
-- Ownership Verification - Owners can only modify their own medicines
-- Rate Limiting - Prevent API abuse (optional)
+## Security
 
-Anti-Spam Logic (Neighbor Sabotage Prevention)
+- JWT-based Authentication
+- Password Hashing using Bcrypt
+- Protected API Routes
+- Ownership Verification
+- Secure Environment Variables
+- Community-driven Stock Verification
+- Optional Rate Limiting
 
-1. Only owners can change medicine status
-2. Public users can only report mismatches
-3. Report threshold: If 5+ users report mismatch, owner gets alert
-4. No automatic status change - Owner must manually verify and update
+---
 
-API Endpoints
+## Future Roadmap
 
-Authentication
+- GPS-based Pharmacy Discovery
+- Prescription Upload
+- AI-powered Medicine Recommendations
+- Mobile Application
+- Push Notifications
+- Real-time Inventory Synchronization
+- Pharmacy Verification
+- Analytics Dashboard
 
-Method Endpoint Description
-POST /api/auth/register Owner registration
-POST /api/auth/login Owner login (returns JWT)
+---
 
-Medicines
+## Contributing
 
-Method Endpoint Description
-GET /api/medicines/search?q={query} Public search
-POST /api/medicines Add single medicine (Owner only)
-POST /api/medicines/bulk-upload Bulk upload Excel (Owner only)
-PUT /api/medicines/:id/status Toggle status (Owner only)
-POST /api/medicines/:id/report Report mismatch (Public)
+Contributions are welcome.
 
-Color Palette
+1. Fork the repository.
+2. Create a feature branch.
 
-Color Hex Code Usage
-Primary Blue #1A5276 Headers, buttons, navbar
-Secondary Teal #148F77 "Available" badges
-Danger Red #E74C3C "Out of Stock" badges
-Background #F0F4F8 Page background
-White #FFFFFF Cards, modals
+```bash
+git checkout -b feature/new-feature
+```
 
-Dependencies
+3. Commit your changes.
 
-Backend
+```bash
+git commit -m "Add new feature"
+```
 
-{
-"express": "^4.18.2",
-"mongoose": "^7.0.0",
-"jsonwebtoken": "^9.0.0",
-"bcryptjs": "^2.4.3",
-"cors": "^2.8.5",
-"dotenv": "^16.0.3",
-"multer": "^1.4.5",
-"xlsx": "^0.18.5"
-}
+4. Push to GitHub.
 
-Frontend
+```bash
+git push origin feature/new-feature
+```
 
-{
-"react": "^18.2.0",
-"react-dom": "^18.2.0",
-"react-router-dom": "^6.8.0",
-"axios": "^1.3.0",
-"vite": "^4.1.0"
-}
+5. Open a Pull Request.
 
-Contributing
+---
 
-1. Fork the repository
-2. Create a feature branch (git checkout -b feature/amazing-feature)
-3. Commit your changes (git commit -m 'Add amazing feature')
-4. Push to branch (git push origin feature/amazing-feature)
-5. Open a Pull Request
+## License
 
-License
+This project is licensed under the MIT License.
 
-This project is open-source and available under the MIT License.
+---
 
-Team
+## Team
 
-Built for the Nepal Hackathon 2026
+**Team 403 Forbidden**
 
-Acknowledgments
+Developed during the Cosmos Hackathon 2026.
 
-- Nepal's pharmacy owners for their valuable feedback
-- Healthcare workers for understanding real-world problems
-- Open-source community for amazing tools and libraries
+---
 
-Support
+## Contact
 
-For issues, questions, or contributions:
+GitHub
 
-- Email: anandkeshari0711.com
-- Issues: https://github.com/anandksri/ausadhi
+```
+https://github.com/anandksri
+```
 
-Made in Nepal By Team 403 Forbidden
+Email
+
+```
+anandkeshari0711@gmail.com
+```
