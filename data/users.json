@@ -1,0 +1,34 @@
+[
+  {
+    "_id": "user_demo_9851012345",
+    "shopName": "Sewa Pharmacy",
+    "ownerName": "Hari Sharma",
+    "phone": "9851012345",
+    "location": "New Road, Kathmandu",
+    "password": "$2b$10$SYe0.mvbWzpvf80LPJiIAegv1pGDUykGvWGWcajUD5f5wVgVhb6ae"
+  },
+  {
+    "_id": "user_demo_9841234567",
+    "shopName": "Pathibhara Pharma",
+    "ownerName": "Sita Dahal",
+    "phone": "9841234567",
+    "location": "Mahendrapath, Dharan",
+    "password": "$2b$10$SYe0.mvbWzpvf80LPJiIAegv1pGDUykGvWGWcajUD5f5wVgVhb6ae"
+  },
+  {
+    "_id": "user_demo_9801234567",
+    "shopName": "Annapurna Medical Hall",
+    "ownerName": "Kiran Gurung",
+    "phone": "9801234567",
+    "location": "Chipledhunga, Pokhara",
+    "password": "$2b$10$SYe0.mvbWzpvf80LPJiIAegv1pGDUykGvWGWcajUD5f5wVgVhb6ae"
+  },
+  {
+    "_id": "user_1782585297457_0uet7",
+    "shopName": "anand condom ",
+    "ownerName": "anand keshari",
+    "phone": "9829454178",
+    "location": "tokha kathmandu",
+    "password": "$2b$10$4SRUUUIo7u0BcJ0tdoJPuuuDgMFyUEAG4dX2yNj8tJm.tIlSYdu3y"
+  }
+]

@@ -1,0 +1,128 @@
+[
+  {
+    "_id": "med_demo_user_demo_9851012345_Paracetamol_500mg",
+    "pharmacyId": "user_demo_9851012345",
+    "medicineName": "Paracetamol 500mg",
+    "category": "Analgesic",
+    "status": "Available",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T17:06:43.703Z"
+  },
+  {
+    "_id": "med_demo_user_demo_9851012345_Amoxicillin_250mg",
+    "pharmacyId": "user_demo_9851012345",
+    "medicineName": "Amoxicillin 250mg",
+    "category": "Antibiotic",
+    "status": "Available",
+    "reportCount": 4,
+    "lastUpdated": "2026-06-27T17:06:43.703Z"
+  },
+  {
+    "_id": "med_demo_user_demo_9851012345_Cetirizine_10mg",
+    "pharmacyId": "user_demo_9851012345",
+    "medicineName": "Cetirizine 10mg",
+    "category": "Antihistamine",
+    "status": "Out_of_Stock",
+    "reportCount": 1,
+    "lastUpdated": "2026-06-27T17:06:43.704Z"
+  },
+  {
+    "_id": "med_demo_user_demo_9851012345_Amlodipine_5mg",
+    "pharmacyId": "user_demo_9851012345",
+    "medicineName": "Amlodipine 5mg",
+    "category": "Cardiovascular",
+    "status": "Available",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T17:06:43.704Z"
+  },
+  {
+    "_id": "med_demo_user_demo_9841234567_Flexon_Tablet",
+    "pharmacyId": "user_demo_9841234567",
+    "medicineName": "Flexon Tablet",
+    "category": "Painkiller",
+    "status": "Available",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T17:06:43.704Z"
+  },
+  {
+    "_id": "med_demo_user_demo_9841234567_Pantoprazole_40mg",
+    "pharmacyId": "user_demo_9841234567",
+    "medicineName": "Pantoprazole 40mg",
+    "category": "Gastrointestinal",
+    "status": "Available",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T17:06:43.704Z"
+  },
+  {
+    "_id": "med_demo_user_demo_9841234567_Metformin_500mg",
+    "pharmacyId": "user_demo_9841234567",
+    "medicineName": "Metformin 500mg",
+    "category": "Antidiabetic",
+    "status": "Out_of_Stock",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T17:06:43.704Z"
+  },
+  {
+    "_id": "med_demo_user_demo_9801234567_Paracetamol_500mg",
+    "pharmacyId": "user_demo_9801234567",
+    "medicineName": "Paracetamol 500mg",
+    "category": "Analgesic",
+    "status": "Out_of_Stock",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T17:06:43.704Z"
+  },
+  {
+    "_id": "med_demo_user_demo_9801234567_Ibuprofen_400mg",
+    "pharmacyId": "user_demo_9801234567",
+    "medicineName": "Ibuprofen 400mg",
+    "category": "Analgesic",
+    "status": "Available",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T17:06:43.704Z"
+  },
+  {
+    "_id": "med_demo_user_demo_9801234567_Azithromycin_500mg",
+    "pharmacyId": "user_demo_9801234567",
+    "medicineName": "Azithromycin 500mg",
+    "category": "Antibiotic",
+    "status": "Available",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T17:06:43.704Z"
+  },
+  {
+    "_id": "med_1782585399480_h8dad",
+    "pharmacyId": "user_1782585297457_0uet7",
+    "medicineName": "Paracetamol 500mg",
+    "category": "Analgesic",
+    "status": "Available",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T18:36:39.480Z"
+  },
+  {
+    "_id": "med_1782585399480_hgck9",
+    "pharmacyId": "user_1782585297457_0uet7",
+    "medicineName": "Amoxicillin 250mg",
+    "category": "Antibiotic",
+    "status": "Available",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T18:36:39.480Z"
+  },
+  {
+    "_id": "med_1782585399480_2clbo",
+    "pharmacyId": "user_1782585297457_0uet7",
+    "medicineName": "Cetirizine 10mg",
+    "category": "Antihistamine",
+    "status": "Available",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T18:36:39.480Z"
+  },
+  {
+    "_id": "med_1782585399480_0rp7d",
+    "pharmacyId": "user_1782585297457_0uet7",
+    "medicineName": "Metformin 500mg",
+    "category": "Antidiabetic",
+    "status": "Available",
+    "reportCount": 0,
+    "lastUpdated": "2026-06-27T18:36:39.480Z"
+  }
+]

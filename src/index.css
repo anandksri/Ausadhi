@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Base Root Setup with Brand Palette */
+:root {
+  --primary-blue: #1A5276;
+  --available-green: #148F77;
+  --out-of-stock-red: #E74C3C;
+  --bg-light: #F0F4F8;
+}
+
+body {
+  background-color: var(--bg-light);
+  font-family: var(--font-sans);
+}
+
+/* --------------------------------------------------
+ * RESPONSIVE BREAKPOINT MEDIA QUERIES
+ * -------------------------------------------------- */
+
+/* 1. Small Mobile (below 480px) */
+@media (max-width: 479px) {
+  html {
+    font-size: 13px;
+  }
+  
+  /* Touch-friendly buttons (min 44px height) */
+  button, 
+  a.button-touch, 
+  input[type="submit"] {
+    min-height: 44px;
+  }
+
+  .responsive-hero-padding {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .responsive-search-bar {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* 2. Mobile (480px to 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+  html {
+    font-size: 14px;
+  }
+
+  button, 
+  a.button-touch, 
+  input[type="submit"] {
+    min-height: 44px;
+  }
+
+  .responsive-search-bar {
+    width: 100% !important;
+  }
+}
+
+/* 3. Tablet (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  html {
+    font-size: 14px;
+  }
+
+  .responsive-search-bar {
+    width: 90% !important;
+    max-width: 90% !important;
+  }
+}
+
+/* 4. Desktop / Laptop (1024px and above) */
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+
+  .responsive-search-bar {
+    width: 100% !important;
+    max-width: 36rem !important; /* Centered medium width */
+  }
+}
