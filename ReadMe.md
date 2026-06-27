@@ -66,42 +66,42 @@ DevOps
 - CORS - Cross-origin resource sharing
 
 Project Structure
-
+```
 ausadhi/
 ├── server/
-│   ├── models/
-│   │   ├── User.js           # Pharmacy owner model
-│   │   └── Medicine.js       # Inventory model
-│   ├── routes/
-│   │   ├── auth.js           # Register/Login routes
-│   │   └── medicines.js      # Medicine CRUD routes
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   └── medicineController.js
-│   ├── middleware/
-│   │   └── auth.js           # JWT verification
-│   ├── server.js             # Entry point
-│   └── .env                  # Environment variables
+│ ├── models/
+│ │ ├── User.js # Pharmacy owner model
+│ │ └── Medicine.js # Inventory model
+│ ├── routes/
+│ │ ├── auth.js # Register/Login routes
+│ │ └── medicines.js # Medicine CRUD routes
+│ ├── controllers/
+│ │ ├── authController.js
+│ │ └── medicineController.js
+│ ├── middleware/
+│ │ └── auth.js # JWT verification
+│ ├── server.js # Entry point
+│ └── .env # Environment variables
 │
 ├── client/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── SearchBar.jsx
-│   │   │   └── MedicineCard.jsx
-│   │   ├── pages/
-│   │   │   ├── Home.jsx
-│   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx
-│   │   │   └── Dashboard.jsx
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   └── package.json
+│ ├── src/
+│ │ ├── components/
+│ │ │ ├── Navbar.jsx
+│ │ │ ├── SearchBar.jsx
+│ │ │ └── MedicineCard.jsx
+│ │ ├── pages/
+│ │ │ ├── Home.jsx
+│ │ │ ├── Login.jsx
+│ │ │ ├── Register.jsx
+│ │ │ └── Dashboard.jsx
+│ │ ├── App.jsx
+│ │ └── main.jsx
+│ └── package.json
 │
 ├── .env.example
 ├── README.md
 └── package.json
-
+```
 Installation and Setup
 
 Prerequisites
@@ -147,33 +147,33 @@ Client runs on: http://localhost:5173
 
 Responsive Breakpoints
 
-Device              Screen Width        Cards per Row
-Small Mobile        below 480px         1
-Mobile              480px - 767px       1
-Tablet              768px - 1023px      2
-Desktop             1024px and above    3
+Device Screen Width Cards per Row
+Small Mobile below 480px 1
+Mobile 480px - 767px 1
+Tablet 768px - 1023px 2
+Desktop 1024px and above 3
 
 Database Schema
 
 User Model (Pharmacy Owner)
 
 {
-  shopName: String, required, unique
-  ownerName: String, required
-  phone: String, required, unique
-  location: String, required
-  password: String, required, hashed
+shopName: String, required, unique
+ownerName: String, required
+phone: String, required, unique
+location: String, required
+password: String, required, hashed
 }
 
 Medicine Model (Inventory)
 
 {
-  pharmacyId: ObjectId, ref: 'User', required
-  medicineName: String, required, indexed
-  category: String
-  status: String, enum: ['Available', 'Out_of_Stock'], default: 'Available'
-  reportCount: Number, default: 0
-  lastUpdated: Date, default: Date.now
+pharmacyId: ObjectId, ref: 'User', required
+medicineName: String, required, indexed
+category: String
+status: String, enum: ['Available', 'Out_of_Stock'], default: 'Available'
+reportCount: Number, default: 0
+lastUpdated: Date, default: Date.now
 }
 
 Security Features
@@ -195,51 +195,51 @@ API Endpoints
 
 Authentication
 
-Method  Endpoint                    Description
-POST    /api/auth/register          Owner registration
-POST    /api/auth/login             Owner login (returns JWT)
+Method Endpoint Description
+POST /api/auth/register Owner registration
+POST /api/auth/login Owner login (returns JWT)
 
 Medicines
 
-Method  Endpoint                           Description
-GET     /api/medicines/search?q={query}    Public search
-POST    /api/medicines                     Add single medicine (Owner only)
-POST    /api/medicines/bulk-upload         Bulk upload Excel (Owner only)
-PUT     /api/medicines/:id/status          Toggle status (Owner only)
-POST    /api/medicines/:id/report          Report mismatch (Public)
+Method Endpoint Description
+GET /api/medicines/search?q={query} Public search
+POST /api/medicines Add single medicine (Owner only)
+POST /api/medicines/bulk-upload Bulk upload Excel (Owner only)
+PUT /api/medicines/:id/status Toggle status (Owner only)
+POST /api/medicines/:id/report Report mismatch (Public)
 
 Color Palette
 
-Color               Hex Code        Usage
-Primary Blue        #1A5276         Headers, buttons, navbar
-Secondary Teal      #148F77         "Available" badges
-Danger Red          #E74C3C         "Out of Stock" badges
-Background          #F0F4F8         Page background
-White               #FFFFFF         Cards, modals
+Color Hex Code Usage
+Primary Blue #1A5276 Headers, buttons, navbar
+Secondary Teal #148F77 "Available" badges
+Danger Red #E74C3C "Out of Stock" badges
+Background #F0F4F8 Page background
+White #FFFFFF Cards, modals
 
 Dependencies
 
 Backend
 
 {
-  "express": "^4.18.2",
-  "mongoose": "^7.0.0",
-  "jsonwebtoken": "^9.0.0",
-  "bcryptjs": "^2.4.3",
-  "cors": "^2.8.5",
-  "dotenv": "^16.0.3",
-  "multer": "^1.4.5",
-  "xlsx": "^0.18.5"
+"express": "^4.18.2",
+"mongoose": "^7.0.0",
+"jsonwebtoken": "^9.0.0",
+"bcryptjs": "^2.4.3",
+"cors": "^2.8.5",
+"dotenv": "^16.0.3",
+"multer": "^1.4.5",
+"xlsx": "^0.18.5"
 }
 
 Frontend
 
 {
-  "react": "^18.2.0",
-  "react-dom": "^18.2.0",
-  "react-router-dom": "^6.8.0",
-  "axios": "^1.3.0",
-  "vite": "^4.1.0"
+"react": "^18.2.0",
+"react-dom": "^18.2.0",
+"react-router-dom": "^6.8.0",
+"axios": "^1.3.0",
+"vite": "^4.1.0"
 }
 
 Contributing
@@ -267,6 +267,7 @@ Acknowledgments
 Support
 
 For issues, questions, or contributions:
+
 - Email: anandkeshari0711.com
 - Issues: https://github.com/anandksri/ausadhi
 
