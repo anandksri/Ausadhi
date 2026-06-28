@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Building, User, MapPin, Phone, Download, Upload, 
   PlusCircle, AlertTriangle, CheckCircle, RefreshCw, 
-  Trash2, Search, Filter, ShieldAlert, ToggleLeft, ToggleRight, X
+  Trash2, Search, Filter, ShieldAlert, ToggleLeft, ToggleRight, X, FileText
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import * as XLSX from "xlsx";
@@ -270,6 +270,13 @@ export default function Dashboard() {
                   <div>
                     <p className="text-gray-400 font-medium">Phone</p>
                     <p className="font-bold text-gray-800">{owner.phone}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 border-l border-gray-200 pl-4">
+                  <FileText className="h-4 w-4 text-[#1A5276]" />
+                  <div>
+                    <p className="text-gray-400 font-medium">PAN Number</p>
+                    <p className="font-bold text-gray-800">{owner.panNumber || "N/A"}</p>
                   </div>
                 </div>
               </div>

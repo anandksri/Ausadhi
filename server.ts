@@ -67,13 +67,19 @@ async function authenticateToken(req: AuthRequest, res: express.Response, next: 
 // 1. POST /api/auth/register - Owner Signup
 app.post("/api/auth/register", async (req, res) => {
   try {
-    const { shopName, ownerName, phone, location, password } = req.body;
+    const { shopName, ownerName, phone, location, password, panNumber } = req.body;
 
-    if (!shopName || !ownerName || !phone || !location || !password) {
+    if (!shopName || !ownerName || !phone || !location || !password || !panNumber) {
       return res.status(400).json({ error: "All fields are required." });
     }
 
-    // Check if shopName or phone already exists
+    // Validate PAN Number format (10-15 alphanumeric characters)
+    const panRegex = /^[a-zA-Z0-9]{10,15}$/;
+    if (!panRegex.test(panNumber)) {
+      return res.status(400).json({ error: "PAN Number must be 10-15 alphanumeric characters." });
+    }
+
+    // Check if shopName, phone or panNumber already exists
     const existingShop = await db.findUserByShopName(shopName);
     if (existingShop) {
       return res.status(400).json({ error: "A pharmacy with this shop name is already registered." });
@@ -82,6 +88,11 @@ app.post("/api/auth/register", async (req, res) => {
     const existingPhone = await db.findUserByPhone(phone);
     if (existingPhone) {
       return res.status(400).json({ error: "This phone number is already registered." });
+    }
+
+    const existingPan = await db.findUserByPan(panNumber);
+    if (existingPan) {
+      return res.status(400).json({ error: "This PAN Number is already registered." });
     }
 
     // Hash the password
@@ -93,12 +104,13 @@ app.post("/api/auth/register", async (req, res) => {
       ownerName,
       phone,
       location,
-      password: hashedPassword
+      password: hashedPassword,
+      panNumber
     });
 
     // Generate JWT
     const token = jwt.sign(
-      { userId: newUser._id, shopName: newUser.shopName },
+      { userId: newUser._id, shopName: newUser.shopName, panNumber: newUser.panNumber },
       JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -111,7 +123,8 @@ app.post("/api/auth/register", async (req, res) => {
         shopName: newUser.shopName,
         ownerName: newUser.ownerName,
         phone: newUser.phone,
-        location: newUser.location
+        location: newUser.location,
+        panNumber: newUser.panNumber
       }
     });
   } catch (error: any) {
@@ -142,7 +155,7 @@ app.post("/api/auth/login", async (req, res) => {
 
     // Generate JWT
     const token = jwt.sign(
-      { userId: user._id, shopName: user.shopName },
+      { userId: user._id, shopName: user.shopName, panNumber: user.panNumber },
       JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -155,7 +168,8 @@ app.post("/api/auth/login", async (req, res) => {
         shopName: user.shopName,
         ownerName: user.ownerName,
         phone: user.phone,
-        location: user.location
+        location: user.location,
+        panNumber: user.panNumber
       }
     });
   } catch (error: any) {
@@ -168,7 +182,12 @@ app.post("/api/auth/login", async (req, res) => {
 app.get("/api/medicines/search", async (req, res) => {
   try {
     const query = (req.query.q as string) || "";
-    const results = await db.searchMedicines(query);
+    const lat = req.query.lat ? parseFloat(req.query.lat as string) : undefined;
+    const lng = req.query.lng ? parseFloat(req.query.lng as string) : undefined;
+    const timeFilter = req.query.timeFilter as string | undefined;
+    const statusFilter = req.query.statusFilter as string | undefined;
+
+    const results = await db.searchMedicines(query, { lat, lng, timeFilter, statusFilter });
     res.json({ results });
   } catch (error: any) {
     console.error("Search error:", error);
@@ -347,6 +366,196 @@ app.get("/api/medicines/my-inventory", authenticateToken as any, async (req: Aut
   } catch (error: any) {
     console.error("Get inventory error:", error);
     res.status(500).json({ error: "Server error while fetching inventory." });
+  }
+});
+
+// ==========================================
+// ADMIN MIDDLEWARE & ROUTES
+// ==========================================
+
+async function authenticateAdminToken(req: AuthRequest, res: express.Response, next: express.NextFunction) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "Access token required. Please log in as admin." });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; shopName: string };
+    req.user = decoded;
+
+    const user = await db.findUserById(decoded.userId);
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ error: "Access denied. Admin rights required." });
+    }
+    next();
+  } catch (err) {
+    return res.status(403).json({ error: "Invalid or expired token." });
+  }
+}
+
+// POST /api/admin/login
+app.post("/api/admin/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required." });
+    }
+
+    const user = await db.findUserByPhone(email);
+    if (!user || !user.isAdmin) {
+      return res.status(400).json({ error: "Invalid email or password." });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Invalid email or password." });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id, shopName: user.shopName, isAdmin: true },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      message: "Admin login successful!",
+      token,
+      user: {
+        id: user._id,
+        shopName: user.shopName,
+        ownerName: user.ownerName,
+        phone: user.phone,
+        location: user.location,
+        isAdmin: true
+      }
+    });
+  } catch (error: any) {
+    console.error("Admin login error:", error);
+    res.status(500).json({ error: "Server error during admin login." });
+  }
+});
+
+// GET /api/admin/stats
+app.get("/api/admin/stats", authenticateAdminToken as any, async (req, res) => {
+  try {
+    const stats = await db.getAdminStats();
+    res.json({ stats });
+  } catch (error: any) {
+    console.error("Admin stats error:", error);
+    res.status(500).json({ error: "Server error fetching admin stats." });
+  }
+});
+
+// GET /api/admin/pharmacies
+app.get("/api/admin/pharmacies", authenticateAdminToken as any, async (req, res) => {
+  try {
+    const pharmacies = await db.getAllUsers();
+    res.json({ pharmacies });
+  } catch (error: any) {
+    console.error("Admin pharmacies error:", error);
+    res.status(500).json({ error: "Server error fetching pharmacies." });
+  }
+});
+
+// PUT /api/admin/pharmacies/:id/toggle-status
+app.put("/api/admin/pharmacies/:id/toggle-status", authenticateAdminToken as any, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updated = await db.toggleUserActiveStatus(id);
+    if (!updated) {
+      return res.status(404).json({ error: "Pharmacy user not found." });
+    }
+    res.json({ message: "Pharmacy status toggled successfully.", user: updated });
+  } catch (error: any) {
+    console.error("Admin toggle user status error:", error);
+    res.status(500).json({ error: "Server error toggling user status." });
+  }
+});
+
+// DELETE /api/admin/pharmacies/:id
+app.delete("/api/admin/pharmacies/:id", authenticateAdminToken as any, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const success = await db.deleteUser(id);
+    if (!success) {
+      return res.status(404).json({ error: "Pharmacy user not found." });
+    }
+    res.json({ message: "Pharmacy and its medicine inventory deleted successfully." });
+  } catch (error: any) {
+    console.error("Admin delete pharmacy error:", error);
+    res.status(500).json({ error: "Server error deleting pharmacy." });
+  }
+});
+
+// GET /api/admin/medicines
+app.get("/api/admin/medicines", authenticateAdminToken as any, async (req, res) => {
+  try {
+    const medicines = await db.getAllMedicinesAdmin();
+    res.json({ medicines });
+  } catch (error: any) {
+    console.error("Admin medicines error:", error);
+    res.status(500).json({ error: "Server error fetching medicines." });
+  }
+});
+
+// PUT /api/admin/medicines/:id/flag
+app.put("/api/admin/medicines/:id/flag", authenticateAdminToken as any, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updated = await db.toggleMedicineFlag(id);
+    if (!updated) {
+      return res.status(404).json({ error: "Medicine listing not found." });
+    }
+    res.json({ message: "Medicine review flag toggled.", medicine: updated });
+  } catch (error: any) {
+    console.error("Admin toggle flag error:", error);
+    res.status(500).json({ error: "Server error toggling review flag." });
+  }
+});
+
+// DELETE /api/admin/medicines/:id
+app.delete("/api/admin/medicines/:id", authenticateAdminToken as any, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const success = await db.deleteMedicine(id);
+    if (!success) {
+      return res.status(404).json({ error: "Medicine not found." });
+    }
+    res.json({ message: "Medicine listing deleted successfully." });
+  } catch (error: any) {
+    console.error("Admin delete medicine error:", error);
+    res.status(500).json({ error: "Server error deleting medicine." });
+  }
+});
+
+// PUT /api/admin/change-password
+app.put("/api/admin/change-password", authenticateAdminToken as any, async (req: AuthRequest, res) => {
+  try {
+    const { newPassword } = req.body;
+    const adminId = req.user?.userId;
+
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ error: "Password must be at least 6 characters long." });
+    }
+
+    if (!adminId) {
+      return res.status(401).json({ error: "Unauthorized access." });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const success = await db.updateAdminPassword(adminId, hashedPassword);
+    
+    if (!success) {
+      return res.status(500).json({ error: "Failed to update admin password." });
+    }
+
+    res.json({ message: "Admin password updated successfully." });
+  } catch (error: any) {
+    console.error("Admin change password error:", error);
+    res.status(500).json({ error: "Server error changing admin password." });
   }
 });
 

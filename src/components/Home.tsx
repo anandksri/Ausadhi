@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Search, MapPin, Phone, AlertTriangle, CheckCircle2, XCircle, RefreshCw, Sparkles } from "lucide-react";
+import { Search, MapPin, Phone, AlertTriangle, CheckCircle2, XCircle, RefreshCw, Sparkles, Filter } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Medicine } from "../types";
 
@@ -12,19 +12,126 @@ export default function Home() {
   const [reporting, setReporting] = useState(false);
   const [reportSuccess, setReportSuccess] = useState<string | null>(null);
 
-  // Trigger search on mount or when search query updates (debounced)
+  // Advanced Filters state
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+  const [timeFilter, setTimeFilter] = useState("any"); // "any", "24h", "7d", "30d"
+  const [statusFilter, setStatusFilter] = useState("all"); // "all", "Available", "Out_of_Stock"
+  const [isNearbyActive, setIsNearbyActive] = useState(false);
+
+  // Dropdown panel states
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [tempLat, setTempLat] = useState<number | null>(null);
+  const [tempLng, setTempLng] = useState<number | null>(null);
+  const [tempTimeFilter, setTempTimeFilter] = useState("any");
+  const [tempStatusFilter, setTempStatusFilter] = useState("all");
+  const [tempIsNearbyActive, setTempIsNearbyActive] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Sync temp state when opening dropdown
+  useEffect(() => {
+    if (isDropdownOpen) {
+      setTempLat(lat);
+      setTempLng(lng);
+      setTempTimeFilter(timeFilter);
+      setTempStatusFilter(statusFilter);
+      setTempIsNearbyActive(isNearbyActive);
+    }
+  }, [isDropdownOpen, lat, lng, timeFilter, statusFilter, isNearbyActive]);
+
+  // Click outside listener to close dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLocationSelect = (nearby: boolean) => {
+    if (!nearby) {
+      setTempLat(null);
+      setTempLng(null);
+      setTempIsNearbyActive(false);
+    } else {
+      setIsLocating(true);
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          setTempLat(pos.coords.latitude);
+          setTempLng(pos.coords.longitude);
+          setTempIsNearbyActive(true);
+          setIsLocating(false);
+        },
+        (err) => {
+          console.error(err);
+          alert("Could not access location. Please check browser permissions.");
+          setIsLocating(false);
+        }
+      );
+    }
+  };
+
+  const handleApplyFilters = () => {
+    setLat(tempLat);
+    setLng(tempLng);
+    setTimeFilter(tempTimeFilter);
+    setStatusFilter(tempStatusFilter);
+    setIsNearbyActive(tempIsNearbyActive);
+    setIsDropdownOpen(false);
+  };
+
+  const handleClearAll = () => {
+    setLat(null);
+    setLng(null);
+    setTimeFilter("any");
+    setStatusFilter("all");
+    setIsNearbyActive(false);
+
+    setTempLat(null);
+    setTempLng(null);
+    setTempTimeFilter("any");
+    setTempStatusFilter("all");
+    setTempIsNearbyActive(false);
+
+    setIsDropdownOpen(false);
+  };
+
+  const isAnyFilterApplied = isNearbyActive || timeFilter !== "any" || statusFilter !== "all";
+
+  // Trigger search on mount or when search query / filters update (debounced)
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      fetchResults(searchQuery);
+      fetchResults(searchQuery, lat, lng, timeFilter, statusFilter);
     }, 300);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchQuery]);
+  }, [searchQuery, lat, lng, timeFilter, statusFilter]);
 
-  const fetchResults = async (query: string) => {
+  const fetchResults = async (
+    query: string,
+    latitude: number | null,
+    longitude: number | null,
+    time: string,
+    status: string
+  ) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/medicines/search?q=${encodeURIComponent(query)}`);
+      let url = `/api/medicines/search?q=${encodeURIComponent(query)}`;
+      if (latitude !== null && longitude !== null) {
+        url += `&lat=${latitude}&lng=${longitude}`;
+      }
+      if (time !== "any") {
+        url += `&timeFilter=${time}`;
+      }
+      if (status !== "all") {
+        url += `&statusFilter=${status}`;
+      }
+
+      const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         setResults(data.results || []);
@@ -90,24 +197,165 @@ export default function Home() {
             Real-time medicine search matched with direct stock updates verified by pharmacies across Nepal.
           </p>
 
-          {/* Search Input Box */}
-          <div className="relative w-full max-w-xl mx-auto px-2 sm:px-0 responsive-search-bar" id="search_container">
-            <div className="absolute inset-y-0 left-0 pl-6 sm:pl-4 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search medicine by name (e.g., Paracetamol, Flexon)..."
-              className="block w-full pl-12 pr-16 py-3.5 sm:py-4 border-0 rounded-2xl bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-teal-400 shadow-lg text-[0.95rem] sm:text-[1rem] outline-none"
-              id="input_search_query"
-            />
-            {isLoading && (
-              <div className="absolute inset-y-0 right-0 pr-6 sm:pr-4 flex items-center pointer-events-none">
-                <RefreshCw className="h-5 w-5 text-teal-600 animate-spin" />
+          {/* Search Input Box & Filter Dropdown container */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 w-full max-w-xl mx-auto px-2 sm:px-0 relative" id="search_and_filter_container">
+            <div className="relative flex-1 responsive-search-bar" id="search_container">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
               </div>
-            )}
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search medicine by name (e.g., Paracetamol, Flexon)..."
+                className="block w-full pl-12 pr-12 py-3.5 sm:py-4 border border-transparent rounded-2xl bg-white text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-teal-400 shadow-lg text-[0.95rem] sm:text-[1rem] outline-none"
+                id="input_search_query"
+              />
+              {isLoading && (
+                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                  <RefreshCw className="h-5 w-5 text-teal-600 animate-spin" />
+                </div>
+              )}
+            </div>
+
+            {/* Filter Dropdown */}
+            <div className="relative" id="filter_dropdown_container" ref={dropdownRef}>
+              <button
+                type="button"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className={`w-full sm:w-auto px-5 py-3.5 sm:py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer border shadow-lg text-sm ${
+                  isAnyFilterApplied
+                    ? "bg-[#148F77] text-white border-transparent hover:bg-[#117a65]"
+                    : "bg-white text-gray-800 border-gray-200 hover:bg-gray-50"
+                }`}
+                id="btn_filter_dropdown_toggle"
+              >
+                <Filter className="h-4 w-4 shrink-0" />
+                <span>Filter</span>
+                {isAnyFilterApplied && (
+                  <span className="bg-white text-[#148F77] text-[0.65rem] px-1.5 py-0.5 rounded-full font-extrabold">
+                    Active
+                  </span>
+                )}
+                <span className="ml-1 text-[0.6rem] opacity-60">▼</span>
+              </button>
+
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-full sm:w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 text-left p-5 text-gray-800"
+                    id="filter_dropdown_panel"
+                  >
+                    {/* Location Filter Section */}
+                    <div className="mb-4">
+                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Location</h4>
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer">
+                          <input
+                            type="radio"
+                            name="locationFilter"
+                            checked={!tempIsNearbyActive}
+                            onChange={() => handleLocationSelect(false)}
+                            className="text-[#1A5276] focus:ring-[#1A5276] h-4 w-4"
+                          />
+                          <span>Anywhere</span>
+                        </label>
+                        <label className="flex items-center gap-2 text-sm font-semibold cursor-pointer">
+                          <input
+                            type="radio"
+                            name="locationFilter"
+                            checked={tempIsNearbyActive}
+                            onChange={() => handleLocationSelect(true)}
+                            className="text-[#1A5276] focus:ring-[#1A5276] h-4 w-4"
+                          />
+                          <span className="flex items-center gap-1">
+                            Nearby Me
+                            {isLocating && <RefreshCw className="h-3 w-3 text-teal-600 animate-spin" />}
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <hr className="border-gray-100 my-3" />
+
+                    {/* Time Filter Section */}
+                    <div className="mb-4">
+                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Last Updated</h4>
+                      <div className="space-y-2">
+                        {[
+                          { val: "any", label: "Any Time" },
+                          { val: "24h", label: "Last 24 Hours" },
+                          { val: "7d", label: "Last 7 Days" },
+                          { val: "30d", label: "Last 30 Days" }
+                        ].map((opt) => (
+                          <label key={opt.val} className="flex items-center gap-2 text-sm font-semibold cursor-pointer">
+                            <input
+                              type="radio"
+                              name="timeFilter"
+                              value={opt.val}
+                              checked={tempTimeFilter === opt.val}
+                              onChange={() => setTempTimeFilter(opt.val)}
+                              className="text-[#1A5276] focus:ring-[#1A5276] h-4 w-4"
+                            />
+                            <span>{opt.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    <hr className="border-gray-100 my-3" />
+
+                    {/* Status Filter Section */}
+                    <div className="mb-4">
+                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Availability Status</h4>
+                      <div className="space-y-2">
+                        {[
+                          { val: "all", label: "All" },
+                          { val: "Available", label: "Available Only" },
+                          { val: "Out_of_Stock", label: "Out of Stock Only" }
+                        ].map((opt) => (
+                          <label key={opt.val} className="flex items-center gap-2 text-sm font-semibold cursor-pointer">
+                            <input
+                              type="radio"
+                              name="statusFilter"
+                              value={opt.val}
+                              checked={tempStatusFilter === opt.val}
+                              onChange={() => setTempStatusFilter(opt.val)}
+                              className="text-[#1A5276] focus:ring-[#1A5276] h-4 w-4"
+                            />
+                            <span>{opt.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
+                      <button
+                        type="button"
+                        onClick={handleClearAll}
+                        className="text-xs font-bold text-[#E74C3C] hover:underline cursor-pointer bg-transparent border-none p-0"
+                        id="btn_clear_filters_link"
+                      >
+                        Clear All
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleApplyFilters}
+                        className="px-4 py-2 bg-[#1A5276] text-white text-xs font-bold rounded-xl hover:bg-[#154360] transition-colors cursor-pointer"
+                        id="btn_apply_filters"
+                      >
+                        Apply Filters
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* Suggested searches */}
@@ -142,14 +390,17 @@ export default function Home() {
             </div>
             <h3 className="text-[1.125rem] font-bold text-gray-800 mb-1">No medicines found</h3>
             <p className="text-gray-500 text-[0.875rem] mb-6">
-              We couldn't find matches for "{searchQuery || "your search"}". Ask your local pharmacy to register and upload their inventory.
+              We couldn't find matches for your selection. Ask your local pharmacy to register and upload their inventory.
             </p>
-            {searchQuery && (
+            {(searchQuery || isNearbyActive || timeFilter !== "any" || statusFilter !== "all") && (
               <button
-                onClick={() => setSearchQuery("")}
+                onClick={() => {
+                  setSearchQuery("");
+                  handleClearAll();
+                }}
                 className="text-[#1A5276] text-[0.875rem] font-bold hover:underline cursor-pointer"
               >
-                Clear Search Filter
+                Clear All Search Filters
               </button>
             )}
           </div>
@@ -190,9 +441,14 @@ export default function Home() {
                       <div className="text-[0.875rem] font-bold text-[#1A5276]">
                         {med.pharmacy.shopName}
                       </div>
-                      <div className="flex items-center text-[0.75rem] text-gray-500 gap-1">
+                      <div className="flex items-center text-[0.75rem] text-gray-500 gap-1 flex-wrap">
                         <MapPin className="h-3.5 w-3.5 text-gray-400 shrink-0" />
-                        <span className="truncate">{med.pharmacy.location}</span>
+                        <span className="truncate max-w-[150px]">{med.pharmacy.location}</span>
+                        {med.distanceKm !== undefined && (
+                          <span className="ml-1.5 px-1.5 py-0.5 rounded bg-teal-50 border border-teal-200 text-[#148F77] text-[0.65rem] font-extrabold shrink-0">
+                            {med.distanceKm < 1 ? `${Math.round(med.distanceKm * 1000)}m` : `${med.distanceKm} km`} away
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center text-[0.75rem] text-gray-500 gap-1">
                         <Phone className="h-3.5 w-3.5 text-gray-400 shrink-0" />
@@ -221,7 +477,7 @@ export default function Home() {
                     </span>
                   </div>
 
-                  {/* Mismatch Alert Box (Neighbor Sabotage warning) */}
+                  {/* Mismatch Alert Box */}
                   {med.reportCount > 0 && (
                     <div className="bg-amber-50 border border-amber-100 rounded-xl p-2.5 flex items-start gap-2 text-[0.75rem] text-amber-800">
                       <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />

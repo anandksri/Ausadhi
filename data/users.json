@@ -30,5 +30,18 @@
     "phone": "9829454178",
     "location": "tokha kathmandu",
     "password": "$2b$10$4SRUUUIo7u0BcJ0tdoJPuuuDgMFyUEAG4dX2yNj8tJm.tIlSYdu3y"
+  },
+  {
+    "_id": "admin_user_001",
+    "shopName": "Ausadhi System Administration",
+    "ownerName": "Super Admin",
+    "phone": "admin@ausadhi.com",
+    "location": "Kathmandu Central Office",
+    "password": "$2b$10$EQka9q7bBqF8cF1hYeC.EuPq7e8S7UJegzKpmyfLsgkaxoUxFQCVu",
+    "lat": 27.7172,
+    "lng": 85.324,
+    "isActive": true,
+    "isAdmin": true,
+    "panNumber": "0000000000"
   }
 ]

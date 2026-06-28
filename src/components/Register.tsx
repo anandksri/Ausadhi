@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Building, User, Phone, MapPin, Lock, ArrowRight, Activity, AlertCircle } from "lucide-react";
+import { Building, User, Phone, MapPin, Lock, ArrowRight, Activity, AlertCircle, FileText, AlertTriangle } from "lucide-react";
 import { AuthResponse } from "../types";
 
 interface RegisterProps {
@@ -12,6 +12,7 @@ export default function Register({ onRegisterSuccess }: RegisterProps) {
   const [ownerName, setOwnerName] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
+  const [panNumber, setPanNumber] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +22,7 @@ export default function Register({ onRegisterSuccess }: RegisterProps) {
     e.preventDefault();
     setError(null);
 
-    if (!shopName || !ownerName || !phone || !location || !password) {
+    if (!shopName || !ownerName || !phone || !location || !password || !panNumber) {
       setError("Please fill in all fields.");
       return;
     }
@@ -31,12 +32,18 @@ export default function Register({ onRegisterSuccess }: RegisterProps) {
       return;
     }
 
+    const panRegex = /^[a-zA-Z0-9]{10,15}$/;
+    if (!panRegex.test(panNumber)) {
+      setError("PAN Number must be 10-15 alphanumeric characters.");
+      return;
+    }
+
     setIsLoading(true);
     try {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ shopName, ownerName, phone, location, password })
+        body: JSON.stringify({ shopName, ownerName, phone, location, password, panNumber })
       });
 
       const data = await response.json();
@@ -147,6 +154,28 @@ export default function Register({ onRegisterSuccess }: RegisterProps) {
               </div>
 
               <div>
+                <label htmlFor="panNumber" className="block text-sm font-semibold text-gray-700">
+                  PAN Number
+                </label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FileText className="h-4.5 w-4.5 text-gray-400" />
+                  </div>
+                  <input
+                    id="panNumber"
+                    type="text"
+                    required
+                    value={panNumber}
+                    onChange={(e) => setPanNumber(e.target.value)}
+                    placeholder="e.g., 1234567890"
+                    className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1A5276] focus:bg-white text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
                 <label htmlFor="location" className="block text-sm font-semibold text-gray-700">
                   Location (Town, City)
                 </label>
@@ -165,25 +194,25 @@ export default function Register({ onRegisterSuccess }: RegisterProps) {
                   />
                 </div>
               </div>
-            </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
-                Create Secure Password
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-4.5 w-4.5 text-gray-400" />
+              <div>
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700">
+                  Create Secure Password
+                </label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-4.5 w-4.5 text-gray-400" />
+                  </div>
+                  <input
+                    id="password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Min 6 characters"
+                    className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1A5276] focus:bg-white text-sm"
+                  />
                 </div>
-                <input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 6 characters"
-                  className="block w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1A5276] focus:bg-white text-sm"
-                />
               </div>
             </div>
 
@@ -198,12 +227,20 @@ export default function Register({ onRegisterSuccess }: RegisterProps) {
                 {!isLoading && <ArrowRight className="ml-2 h-4 w-4" />}
               </button>
             </div>
+
+            {/* Legal Caution Note */}
+            <div className="p-3 border border-[#E74C3C] bg-[#FDE8E8] text-[#8B0000] text-xs rounded-lg flex items-start gap-2.5 shadow-xs" id="legal_disclaimer_box">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-[#E74C3C] mt-0.5" />
+              <div className="leading-relaxed">
+                <span className="font-bold">Important:</span> Please ensure all information provided is accurate. Providing false information, including incorrect PAN number or shop details, may lead to legal consequences under Nepal's applicable laws. Ausadhi reserves the right to suspend or remove accounts found in violation.
+              </div>
+            </div>
           </form>
 
           <div className="mt-6 text-center">
             <span className="text-sm text-gray-500">Already registered?</span>{" "}
             <Link to="/login" className="text-sm font-bold text-[#1A5276] hover:underline">
-              Owner Login
+               Login
             </Link>
           </div>
         </div>

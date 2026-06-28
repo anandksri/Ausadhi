@@ -41,6 +41,20 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
           >
             Home
           </Link>
+          <Link
+            to="/about"
+            className="text-gray-700 hover:text-[#1A5276] px-3 py-2 rounded-md text-sm font-semibold transition-colors"
+            id="nav_link_about"
+          >
+            About Us
+          </Link>
+          <Link
+            to="/contact"
+            className="text-gray-700 hover:text-[#1A5276] px-3 py-2 rounded-md text-sm font-semibold transition-colors"
+            id="nav_link_contact"
+          >
+            Contact
+          </Link>
 
           {user ? (
             <>
@@ -77,7 +91,7 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
                 className="text-[#1A5276] border border-[#1A5276] hover:bg-[#1A5276]/5 px-3.5 py-2 rounded-lg text-sm font-semibold transition-colors"
                 id="nav_link_login"
               >
-                Owner Login
+                Login
               </Link>
               <Link
                 to="/register"
@@ -113,6 +127,22 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
             id="mobile_link_home"
           >
             Home
+          </Link>
+          <Link
+            to="/about"
+            onClick={() => setIsMenuOpen(false)}
+            className="block text-gray-700 hover:text-[#1A5276] hover:bg-gray-50 px-3 py-2.5 rounded-lg text-base font-semibold transition-colors"
+            id="mobile_link_about"
+          >
+            About Us
+          </Link>
+          <Link
+            to="/contact"
+            onClick={() => setIsMenuOpen(false)}
+            className="block text-gray-700 hover:text-[#1A5276] hover:bg-gray-50 px-3 py-2.5 rounded-lg text-base font-semibold transition-colors"
+            id="mobile_link_contact"
+          >
+            Contact
           </Link>
 
           {user ? (
