@@ -1,5 +1,5 @@
 {
-  "name": "react-example",
+  "name": "ausadhi",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -44,9 +44,9 @@
     "typescript": "~5.8.2",
     "vite": "^6.2.3"
   },
-  "description": "> **A Hyper-Local Medicine Availability & Stock Verification Tracker for Nepal.**",
+  "description": "A hyper-local medicine availability and stock verification tracker for Nepal.",
   "main": "index.js",
-  "keywords": [],
-  "author": "",
+  "keywords": ["medicine", "healthcare", "nepal", "stock-tracking"],
+  "author": "Anand Keshari",
   "license": "ISC"
 }
